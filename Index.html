@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeoN — תיאום חזרות</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&family=Heebo:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root{
+  --bg: #16140f;
+  --surface: #201d17;
+  --surface-2: #2a261e;
+  --line: #3a352a;
+  --ink: #f1ead9;
+  --ink-dim: #a89e88;
+  --amber: #e8a33d;
+  --coral: #e2604f;
+  --teal: #3fa89a;
+  --violet: #9376d9;
+  --lime: #b7c24a;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+
+body{
+  background:
+    radial-gradient(ellipse 900px 500px at 85% -10%, rgba(232,163,61,0.10), transparent),
+    radial-gradient(ellipse 700px 400px at 10% 110%, rgba(63,168,154,0.08), transparent),
+    var(--bg);
+  color: var(--ink);
+  font-family: 'Heebo', sans-serif;
+  min-height: 100vh;
+  padding: 28px 16px 60px;
+}
+
+.wrap{ max-width: 920px; margin: 0 auto; }
+
+/* ---- Header ---- */
+header{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom: 26px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 20px;
+}
+.eyebrow{
+  font-family:'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--amber);
+  text-transform: uppercase;
+}
+.band-name-input{
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed transparent;
+  color: var(--amber);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  outline: none;
+  padding: 0 2px;
+  min-width: 3ch;
+}
+.band-name-input:hover, .band-name-input:focus{ border-bottom-color: var(--amber); }
+.band-name-input::placeholder{ color: #8a6a30; text-transform:none; letter-spacing:normal; }
+h1{
+  font-family:'Rubik', sans-serif;
+  font-weight: 900;
+  font-size: clamp(32px, 6vw, 46px);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.sub{
+  color: var(--ink-dim);
+  font-size: 14px;
+  max-width: 62ch;
+}
+
+/* ---- Members strip ---- */
+.members-config{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom: 22px;
+}
+.member-name-input{
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-bottom: 3px solid var(--m-color, var(--amber));
+  color: var(--ink);
+  font-family:'Heebo', sans-serif;
+  font-weight:500;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 6px 6px 3px 3px;
+  width: 110px;
+  outline: none;
+  transition: background .15s;
+}
+.member-name-input:focus{ background: var(--surface-2); }
+
+/* ---- Who am I selector ---- */
+.whoami{
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 22px;
+}
+.whoami-label{
+  font-family:'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-dim);
+  letter-spacing:.08em;
+  margin-bottom: 10px;
+  text-transform:uppercase;
+}
+.whoami-tabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.tab{
+  border: 1.5px solid var(--line);
+  background: transparent;
+  color: var(--ink-dim);
+  font-family:'Heebo',sans-serif;
+  font-weight:600;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor:pointer;
+  transition: all .15s;
+  position:relative;
+}
+.tab .dot{
+  display:inline-block;
+  width:8px; height:8px;
+  border-radius:50%;
+  background: var(--m-color);
+  margin-inline-start:6px;
+}
+.tab.active{
+  border-color: var(--m-color);
+  background: color-mix(in srgb, var(--m-color) 18%, transparent);
+  color: var(--ink);
+}
+.tab:hover{ color: var(--ink); }
+
+/* ---- Month navigation ---- */
+.month-nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom: 14px;
+}
+.month-label{
+  font-family:'Rubik', sans-serif;
+  font-weight:900;
+  font-size: 22px;
+  color: var(--ink);
+}
+.month-btn{
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-family:'JetBrains Mono', monospace;
+  font-size: 15px;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition: all .15s;
+}
+.month-btn:hover{ border-color: var(--amber); color: var(--amber); }
+.month-btn.today-btn{
+  width:auto;
+  padding: 0 14px;
+  font-family:'Heebo',sans-serif;
+  font-weight:600;
+  font-size: 12px;
+}
+
+/* ---- Calendar grid ---- */
+.grid-card{
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  overflow-x:auto;
+}
+.weekday-row{
+  display:grid;
+  grid-template-columns: repeat(7, minmax(96px,1fr));
+  gap: 6px;
+  min-width: 700px;
+  margin-bottom: 6px;
+}
+.weekday-head{
+  font-family:'Rubik',sans-serif;
+  font-weight:700;
+  font-size: 12px;
+  text-align:center;
+  color: var(--ink-dim);
+  padding-bottom: 4px;
+}
+.month-grid{
+  display:grid;
+  grid-template-columns: repeat(7, minmax(96px,1fr));
+  grid-auto-rows: 118px;
+  gap: 6px;
+  min-width: 700px;
+}
+.day-cell{
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 7px 7px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  cursor:pointer;
+  position:relative;
+  transition: border-color .15s;
+}
+.day-cell:hover{ border-color: var(--ink-dim); }
+.day-cell.outside{
+  background: transparent;
+  border-color: transparent;
+  cursor:default;
+}
+.day-cell.today{ border-color: var(--amber); }
+.day-cell.mine{ box-shadow: inset 0 0 0 2px var(--m-color); }
+.day-cell.full{ border-color: var(--lime); }
+.day-num{
+  font-family:'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+.day-cell.today .day-num{ color: var(--amber); font-weight:600; }
+.day-dots{
+  display:flex;
+  gap:3px;
+  flex-wrap:wrap;
+}
+.pdot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.day-note{
+  margin-top:auto;
+  background: transparent;
+  border: none;
+  border-top: 1px dashed var(--line);
+  color: var(--ink);
+  font-family:'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding-top: 3px;
+  width: 100%;
+  outline:none;
+}
+.day-note::placeholder{ color: #5c5648; }
+.day-cell.outside .day-note{ display:none; }
+.day-location{
+  font-family:'Heebo', sans-serif;
+  font-size: 11px;
+  color: var(--teal);
+  border-top: none !important;
+  padding-top: 0 !important;
+}
+.day-location::placeholder{ color: #5c5648; }
+
+.eq{
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height: 3px;
+  background: transparent;
+  border-radius: 0 0 8px 8px;
+  overflow:hidden;
+}
+.eq-fill{ height:100%; transition: width .2s; }
+.day-cell.full .eq-fill{ background: linear-gradient(90deg, var(--lime), var(--amber)); }
+
+/* ---- Legend / best time ---- */
+.best-time{
+  margin-top: 18px;
+  background: linear-gradient(135deg, rgba(232,163,61,0.12), rgba(183,194,74,0.08));
+  border: 1px solid rgba(232,163,61,0.35);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family:'Heebo', sans-serif;
+  font-size: 14px;
+  display:none;
+}
+.best-time.show{ display:block; }
+.best-time b{ font-family:'Rubik',sans-serif; color: var(--amber); }
+
+footer{
+  margin-top: 22px;
+  color: var(--ink-dim);
+  font-size: 12px;
+  text-align:center;
+  font-family:'JetBrains Mono', monospace;
+}
+
+.reset-btn{
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--ink-dim);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  margin-inline-start:auto;
+}
+.reset-btn:hover{ color:var(--coral); border-color:var(--coral); }
+.top-row{ display:flex; align-items:center; margin-bottom:10px; }
+.hint{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-dim); }
+
+@media (max-width: 480px){
+  .weekday-row, .month-grid{ grid-template-columns: repeat(7, minmax(70px,1fr)); min-width:560px; }
+  .month-grid{ grid-auto-rows: 74px; }
+  .day-note{ font-size:10px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">// <input type="text" id="bandNameInput" class="band-name-input" maxlength="24" placeholder="שם ההרכב"> · תיאום חזרות</div>
+    <h1>מתי כולם פנויים?</h1>
+    <div class="sub">כל חבר להקה בוחר את השם שלו, ומסמן על הלוח את הימים שהוא פנוי לחזרה. ליד כל תאריך אפשר לכתוב חופשי את שעת החזרה המוצעת. ימים שמאירים בירוק — כולם פנויים.</div>
+  </header>
+
+  <div class="members-config" id="membersConfig"></div>
+
+  <div class="whoami">
+    <div class="whoami-label">מי אתה?</div>
+    <div class="whoami-tabs" id="whoamiTabs"></div>
+  </div>
+
+  <div class="month-nav">
+    <button class="month-btn" id="prevMonth" title="חודש קודם">›</button>
+    <div class="month-label" id="monthLabel"></div>
+    <button class="month-btn" id="nextMonth" title="חודש הבא">‹</button>
+  </div>
+
+  <div class="grid-card">
+    <div class="top-row">
+      <button class="month-btn today-btn" id="todayBtn">החודש הנוכחי</button>
+      <span class="hint" style="margin-inline-start:12px;">לחיצה על יום = מסמן/מבטל פנוי · שני השדות למטה הם שעה ומיקום, כטקסט חופשי</span>
+      <button class="reset-btn" id="resetBtn">איפוס החודש הזה עבורי</button>
+    </div>
+    <div class="weekday-row" id="weekdayRow"></div>
+    <div class="month-grid" id="monthGrid"></div>
+  </div>
+
+  <div class="best-time" id="bestTime"></div>
+
+  <footer id="statusLine">טוען נתונים…</footer>
+</div>
+
+<script>
+const DAY_NAMES = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+const MONTH_NAMES = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const COLORS = ['--amber','--coral','--teal','--violet','--lime'];
+const COLOR_HEX = { '--amber':'#e8a33d', '--coral':'#e2604f', '--teal':'#3fa89a', '--violet':'#9376d9', '--lime':'#b7c24a' };
+const DEFAULT_NAMES = ['חבר 1','חבר 2','חבר 3','חבר 4','חבר 5'];
+const MEMBER_KEYS = ['m1','m2','m3','m4','m5'];
+
+let bandName = 'NeoN';
+let members = DEFAULT_NAMES.slice();
+let availability = { m1:[], m2:[], m3:[], m4:[], m5:[] };
+let timeNotes = {};
+let locationNotes = {};
+let currentMember = 0;
+let viewDate = new Date();
+viewDate.setDate(1);
+viewDate.setHours(0,0,0,0);
+
+function isoDate(d){
+  return d.getFullYear() + '-' + (d.getMonth()+1).toString().padStart(2,'0') + '-' + d.getDate().toString().padStart(2,'0');
+}
+function isSameDay(a,b){
+  return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+}
+
+async function loadAll(){
+  try{
+    const bn = await window.storage.get('band-name', true);
+    if(bn && bn.value){
+      const parsed = JSON.parse(bn.value);
+      if(typeof parsed === 'string' && parsed.trim()) bandName = parsed;
+    }
+  }catch(e){}
+
+  try{
+    const cfg = await window.storage.get('members-config', true);
+    if(cfg && cfg.value){
+      const parsed = JSON.parse(cfg.value);
+      if(Array.isArray(parsed) && parsed.length===5) members = parsed;
+    }
+  }catch(e){}
+
+  for(let i=0;i<5;i++){
+    try{
+      const res = await window.storage.get('availability:' + MEMBER_KEYS[i], true);
+      if(res && res.value) availability[MEMBER_KEYS[i]] = JSON.parse(res.value);
+    }catch(e){ availability[MEMBER_KEYS[i]] = []; }
+  }
+
+  try{
+    const notes = await window.storage.get('time-notes', true);
+    if(notes && notes.value) timeNotes = JSON.parse(notes.value);
+  }catch(e){ timeNotes = {}; }
+
+  try{
+    const locs = await window.storage.get('location-notes', true);
+    if(locs && locs.value) locationNotes = JSON.parse(locs.value);
+  }catch(e){ locationNotes = {}; }
+}
+
+async function saveBandName(){
+  try{ await window.storage.set('band-name', JSON.stringify(bandName), true); }
+  catch(e){ console.error('שמירת שם ההרכב נכשלה', e); }
+}
+async function saveConfig(){
+  try{ await window.storage.set('members-config', JSON.stringify(members), true); }
+  catch(e){ console.error('שמירת שמות נכשלה', e); }
+}
+async function saveMember(idx){
+  try{ await window.storage.set('availability:' + MEMBER_KEYS[idx], JSON.stringify(availability[MEMBER_KEYS[idx]]), true); }
+  catch(e){ console.error('שמירה נכשלה', e); }
+}
+async function saveNotes(){
+  try{ await window.storage.set('time-notes', JSON.stringify(timeNotes), true); }
+  catch(e){ console.error('שמירת הערה נכשלה', e); }
+}
+async function saveLocations(){
+  try{ await window.storage.set('location-notes', JSON.stringify(locationNotes), true); }
+  catch(e){ console.error('שמירת מיקום נכשלה', e); }
+}
+
+function renderBandName(){
+  const input = document.getElementById('bandNameInput');
+  if(!input) return;
+  input.value = bandName;
+  input.size = Math.max(4, bandName.length);
+  document.title = bandName + ' — תיאום חזרות';
+  input.addEventListener('input', () => {
+    input.size = Math.max(4, input.value.length);
+  });
+  input.addEventListener('change', async () => {
+    bandName = input.value.trim() || 'NeoN';
+    input.value = bandName;
+    input.size = Math.max(4, bandName.length);
+    document.title = bandName + ' — תיאום חזרות';
+    await saveBandName();
+  });
+}
+
+function renderMembersConfig(){
+  const el = document.getElementById('membersConfig');
+  el.innerHTML = '';
+  members.forEach((name, i) => {
+    const input = document.createElement('input');
+    input.className = 'member-name-input';
+    input.style.setProperty('--m-color', COLOR_HEX[COLORS[i]]);
+    input.value = name;
+    input.maxLength = 14;
+    input.addEventListener('change', async () => {
+      members[i] = input.value.trim() || DEFAULT_NAMES[i];
+      renderWhoAmI();
+      await saveConfig();
+    });
+    el.appendChild(input);
+  });
+}
+
+function renderWhoAmI(){
+  const el = document.getElementById('whoamiTabs');
+  el.innerHTML = '';
+  members.forEach((name, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (i===currentMember ? ' active' : '');
+    btn.style.setProperty('--m-color', COLOR_HEX[COLORS[i]]);
+    btn.innerHTML = name + '<span class="dot"></span>';
+    btn.addEventListener('click', () => {
+      currentMember = i;
+      renderWhoAmI();
+      renderCalendar();
+    });
+    el.appendChild(btn);
+  });
+}
+
+function renderMonthLabel(){
+  document.getElementById('monthLabel').textContent = MONTH_NAMES[viewDate.getMonth()] + ' ' + viewDate.getFullYear();
+}
+
+function renderWeekdayRow(){
+  const row = document.getElementById('weekdayRow');
+  row.innerHTML = '';
+  DAY_NAMES.forEach(name => {
+    const h = document.createElement('div');
+    h.className = 'weekday-head';
+    h.textContent = name;
+    row.appendChild(h);
+  });
+}
+
+function renderCalendar(){
+  const grid = document.getElementById('monthGrid');
+  grid.innerHTML = '';
+  const today = new Date();
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const firstOfMonth = new Date(year, month, 1);
+  const startOffset = firstOfMonth.getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+
+  for(let cellIdx=0; cellIdx<totalCells; cellIdx++){
+    const dayNum = cellIdx - startOffset + 1;
+    const cell = document.createElement('div');
+
+    if(dayNum < 1 || dayNum > daysInMonth){
+      cell.className = 'day-cell outside';
+      grid.appendChild(cell);
+      continue;
+    }
+
+    const dateObj = new Date(year, month, dayNum);
+    const key = isoDate(dateObj);
+    const whoIsFree = [];
+    MEMBER_KEYS.forEach((mk,i) => { if(availability[mk].includes(key)) whoIsFree.push(i); });
+
+    cell.className = 'day-cell';
+    if(isSameDay(dateObj, today)) cell.classList.add('today');
+    if(whoIsFree.includes(currentMember)) cell.classList.add('mine');
+    if(whoIsFree.length === 5) cell.classList.add('full');
+
+    const num = document.createElement('div');
+    num.className = 'day-num';
+    num.textContent = dayNum;
+    cell.appendChild(num);
+
+    const dots = document.createElement('div');
+    dots.className = 'day-dots';
+    whoIsFree.forEach(i => {
+      const d = document.createElement('div');
+      d.className = 'pdot';
+      d.style.background = COLOR_HEX[COLORS[i]];
+      dots.appendChild(d);
+    });
+    cell.appendChild(dots);
+
+    const note = document.createElement('input');
+    note.className = 'day-note';
+    note.type = 'text';
+    note.placeholder = 'שעה...';
+    note.value = timeNotes[key] || '';
+    note.maxLength = 20;
+    note.addEventListener('click', e => e.stopPropagation());
+    note.addEventListener('change', async () => {
+      const val = note.value.trim();
+      if(val) timeNotes[key] = val; else delete timeNotes[key];
+      renderBestTime();
+      await saveNotes();
+    });
+    cell.appendChild(note);
+
+    const loc = document.createElement('input');
+    loc.className = 'day-note day-location';
+    loc.type = 'text';
+    loc.placeholder = 'מיקום...';
+    loc.value = locationNotes[key] || '';
+    loc.maxLength = 24;
+    loc.addEventListener('click', e => e.stopPropagation());
+    loc.addEventListener('change', async () => {
+      const val = loc.value.trim();
+      if(val) locationNotes[key] = val; else delete locationNotes[key];
+      renderBestTime();
+      await saveLocations();
+    });
+    cell.appendChild(loc);
+
+    const eq = document.createElement('div');
+    eq.className = 'eq';
+    const fill = document.createElement('div');
+    fill.className = 'eq-fill';
+    fill.style.width = (whoIsFree.length/5*100) + '%';
+    if(whoIsFree.length < 5) fill.style.background = COLOR_HEX[COLORS[currentMember]];
+    eq.appendChild(fill);
+    cell.appendChild(eq);
+
+    cell.addEventListener('click', async () => {
+      const mk = MEMBER_KEYS[currentMember];
+      const idx = availability[mk].indexOf(key);
+      if(idx >= 0) availability[mk].splice(idx,1);
+      else availability[mk].push(key);
+      renderCalendar();
+      renderBestTime();
+      await saveMember(currentMember);
+    });
+
+    grid.appendChild(cell);
+  }
+}
+
+function renderBestTime(){
+  const el = document.getElementById('bestTime');
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const fullDays = [];
+
+  for(let d=1; d<=daysInMonth; d++){
+    const dateObj = new Date(year, month, d);
+    const key = isoDate(dateObj);
+    const count = MEMBER_KEYS.filter(mk => availability[mk].includes(key)).length;
+    if(count === 5){
+      let entry = DAY_NAMES[dateObj.getDay()] + ' ' + d + '/' + (month+1);
+      if(timeNotes[key]) entry += ' בשעה ' + timeNotes[key];
+      if(locationNotes[key]) entry += ' ב-' + locationNotes[key];
+      fullDays.push(entry);
+    }
+  }
+
+  if(fullDays.length){
+    el.classList.add('show');
+    el.innerHTML = '🎸 <b>כולם פנויים:</b> ' + fullDays.join(' &nbsp;|&nbsp; ');
+  } else {
+    el.classList.remove('show');
+  }
+}
+
+document.getElementById('resetBtn').addEventListener('click', async () => {
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const keysThisMonth = new Set();
+  for(let d=1; d<=daysInMonth; d++) keysThisMonth.add(isoDate(new Date(year, month, d)));
+  const mk = MEMBER_KEYS[currentMember];
+  availability[mk] = availability[mk].filter(k => !keysThisMonth.has(k));
+  renderCalendar();
+  renderBestTime();
+  await saveMember(currentMember);
+});
+
+document.getElementById('prevMonth').addEventListener('click', () => {
+  viewDate.setMonth(viewDate.getMonth() - 1);
+  viewDate = new Date(viewDate);
+  renderMonthLabel();
+  renderCalendar();
+  renderBestTime();
+});
+document.getElementById('nextMonth').addEventListener('click', () => {
+  viewDate.setMonth(viewDate.getMonth() + 1);
+  viewDate = new Date(viewDate);
+  renderMonthLabel();
+  renderCalendar();
+  renderBestTime();
+});
+document.getElementById('todayBtn').addEventListener('click', () => {
+  viewDate = new Date();
+  viewDate.setDate(1);
+  viewDate.setHours(0,0,0,0);
+  renderMonthLabel();
+  renderCalendar();
+  renderBestTime();
+});
+
+async function init(){
+  await loadAll();
+  renderBandName();
+  renderMembersConfig();
+  renderWhoAmI();
+  renderMonthLabel();
+  renderWeekdayRow();
+  renderCalendar();
+  renderBestTime();
+  document.getElementById('statusLine').textContent = 'הנתונים נשמרים אוטומטית ומשותפים לכל חברי הלהקה';
+}
+
+init();
+</script>
+</body>
+</html>
